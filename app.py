@@ -154,6 +154,45 @@ st.write("Only **10% of songs** crack both platforms, suggesting that true cross
 st.write("Examples: Blinding Lights, Shape of You, As It Was — songs with massive mainstream appeal that translate across different listening behaviors.")
 st.caption("Both Platforms ranking uses a combined score: normalized TikTok Views + normalized Spotify Streams. This rewards songs that perform strongly on both platforms equally.")
 
+# Feature importance chart
+st.subheader(" Which Auido Features Predict Popularity?")
+audio_features=['danceability', 'energy', 'valence', 'tempo', 
+                  'acousticness', 'loudness', 'speechiness', 
+                  'instrumentalness', 'liveness' ]
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
+df_tiktok['is_hit']=(df_tiktok['popularity'] >=60).astype(int)
+X=df_tiktok[audio_features]
+y=df_tiktok['is_hit']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model=RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+importance_df=pd.DataFrame({
+    'feature' : audio_features,
+    'importance': model.feature_importances_}).sort_values('importance', ascending=False)
+
+fig4, ax=plt.subplots(figsize=(10,6))
+sns.barplot(data=importance_df, x='importance', y='feature', color='steelblue', ax=ax)
+ax.set_title('Audio Feature Importance for Predicting Popularity')
+ax.set_xlabel('Importance Score')
+ax.set_ylabel('Feature')
+plt.tight_layout()
+st.pyplot(fig4)
+
+# Correlation heatmap 
+st.subheader("Audio Feature Correlations")
+
+corr_matrix = df_tiktok[audio_features + ['popularity']].corr()
+
+fig5, ax=plt.subplots(figsize=(10,8))
+sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm', center=0, square=True, ax=ax)
+plt.tight_layout()
+st.pyplot(fig5)
+
+
+
 # ML Model Results
 st.subheader("Machine Learning: Can We Predict a Hit?")
 st.write("We trained 3 models to predict whether a TikTok trending song would be a Spotify hit based on audio features alone.")
