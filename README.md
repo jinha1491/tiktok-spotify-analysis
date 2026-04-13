@@ -2,7 +2,7 @@
 
 A data science project analyzing 3,560 TikTok trending tracks and 4,370 top Spotify songs to uncover what drives virality across platforms.
 
- **[Live App](https://tiktok-spotify-jinha1491.streamlit.app)**
+
 
 ---
 
